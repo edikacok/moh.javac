@@ -9,7 +9,10 @@ public class ProjectModel extends Model {
     private String title;
     private String description;
     
-    
+    public ProjectModel() {
+        this.title = "";
+        this.description = "";
+    }
     public ProjectModel getOne(int id) {
         //ArrayList arr = new ArrayList();
         String sql = "SELECT * FROM project WHERE id = " + id;
@@ -43,6 +46,20 @@ public class ProjectModel extends Model {
         return true;
     }
     
+    public boolean update(int id) {
+        String sql = "UPDATE project SET " + "title = '" + this.title + "', " 
+                + "description = '" + this.description +"' " 
+                + "WHERE id = " + id;;
+        try {
+            Statement stmt = this.getStmt();
+            stmt.execute(sql);
+        } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+        }
+        return true;
+    }
+    
     
     public boolean delete(int id) {
         String sql = "DELETE FROM project WHERE id = " + id;
@@ -59,6 +76,34 @@ public class ProjectModel extends Model {
     public ArrayList getAll() {
         ArrayList arr = new ArrayList();
         String sql = "SELECT * FROM project";
+        try {
+            Statement stmt = this.getStmt();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                ProjectModel pro = new ProjectModel();
+                pro.id = rs.getInt("id");
+                pro.title = rs.getString("title");
+                pro.description = rs.getString("description");
+                arr.add(pro);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return arr;
+    }
+    
+    public ArrayList search(String title, String desc) {
+        ArrayList arr = new ArrayList();
+        String sql = "SELECT * FROM project WHERE 1 ";
+        if (! title.equals("")) {
+            sql += "AND title LIKE '%" + title + "%'"; 
+        }
+        
+        if (! desc.equals("")) {
+            sql += "AND description LIKE '%" + desc + "%'";
+        }
+        
+        System.out.println(sql);
         try {
             Statement stmt = this.getStmt();
             ResultSet rs = stmt.executeQuery(sql);
